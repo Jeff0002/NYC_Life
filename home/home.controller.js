@@ -5,24 +5,17 @@
         .module('app')
         .controller('HomeController', ['$scope', '$routeParams', '$http', '$sce',
             function($scope, $routeParams, $http, $sce) {
-                                       
-                $scope.username = $routeParams.username;
 
-                /*
-                $http.get('profile/' + $routeParams.username).success(function(data) {
-                    $scope.profile = data;
-                    */
-                console.log('prepare to http get');
-                //$http.get('http://bizzbuz-linxin-li.herokuapp.com/api/user-all').then(function(response) {
+                $scope.username = $routeParams.username;
+  
                 $http.get("http://localhost:8888/api/user").then(function(response) {
                     $scope.test = response.data;
                 });
-                console.log($scope.username);
                 
                 $http.get('http://localhost:8888/api/user/' + $routeParams.username).then(function(response) {
-                    console.log(response.data);
+                    //console.log(response.data);
                     $scope.profile = response.data[0];
-                    //$scope.profile = JSON.parse(response.data);
+                    //console.log($scope.profile);
                 });
                 
                 /* for test
@@ -33,10 +26,17 @@
                     duration: 4
                 };*/
                 
-                /*
-                $http.get('friends/' + $routeParams.username).success(function(data) {
-                    $scope.friends = data;
-                    */
+                $http.get('http://localhost:8888/api/relationship/' + $routeParams.username).then(function(response) {
+                    //$scope.friends = response.data;
+                    //console.log(response.data);
+                    $scope.friends = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        $scope.friends.push(response.data[i].Friend);
+                    }
+                    //console.log($scope.friends);
+                });
+
+                /* test for friends
                 $scope.friends = [
                     {
                         username: 'Jeff0003',
@@ -45,6 +45,8 @@
                         username: 'Jeff0004'
                     }
                 ];
+                
+                */
                 
                 /*
                 $http.get('posts/' + $routeParams.username).success(function(data) {
@@ -121,14 +123,13 @@
                 http.get('peopleMayKnow/' + $routeParams.username).success(function(data) {
                     $scope.peopleMayKnow = data;
                     */
-                $scope.peopleMayKnow = [
-                    {
-                        username: 'Jeff0004'
-                    },
-                    {
-                        username: 'Jeff0005'
+                
+                $http.get('http://localhost:8888/api/relationship/friend/' +  $routeParams.username).then(function(response) {
+                    $scope.peopleMayKnow = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        $scope.peopleMayKnow.push(response.data[i].Friend);
                     }
-                ];
+                })
                 }]);
                 
     angular

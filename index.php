@@ -293,7 +293,7 @@ $app->post('/api/local',function() use ($app){
         $response->setJsonContent(
             array(
                 'status' => 'OK',
-                'data'   => $news
+                'data'   => $local
             )
         );
 
@@ -332,7 +332,152 @@ $app->get('/api/relationship',function() use($app){
   echo json_encode($data);
 });
 
+//post relationship
+$app->post('/api/relationship',function() use ($app){
+  $relation = $app->request->getJsonRawBody();
+  $phql = "INSERT INTO Relationship (UserId, Friend) VALUES (:UserId:, :Friend:)";
+  $status = $app->modelsManager->executeQuery($phql,array(
+    'UserId' => $relation->UserId,
+    'Friend' => $relation->Friend
+  ));
 
+  $response = new Phalcon\Http\Response();
+    if ($status->success() == true) {
+        $response->setStatusCode(201, "Created");
+
+
+        $response->setJsonContent(
+            array(
+                'status' => 'OK',
+                'data'   => $relation
+            )
+        );
+
+    } else {
+        $response->setStatusCode(409, "Conflict");
+        $errors = array();
+        foreach ($status->getMessages() as $message) {
+            $errors[] = $message->getMessage();
+        }
+
+        $response->setJsonContent(
+            array(
+                'status'   => 'ERROR',
+                'messages' => $errors
+            )
+        );
+    }
+
+    return $response;
+
+});
+//get friend from user
+$app->get('/api/relationship/{UserId}',function($UserId) use ($app){
+
+  $phql = "SELECT * FROM Relationship WHERE UserId LIKE :UserId: ORDER BY UserId";
+  $relations = $app->modelsManager->executeQuery($phql,array(
+    'UserId' => '%'. $UserId .'%'
+  ));
+
+  $data = array();
+  foreach($relations as $relation){
+    $data[] = array(
+    'UserId' => $relation->UserId,
+    'Friend' => $relation->Friend
+   );
+  }
+  echo json_encode($data);
+
+});
+
+//get friend from user's friend
+$app->get('/api/relationship/friend/{UserId}',function($UserId) use ($app){
+
+  $phql = "SELECT * FROM Relationship WHERE UserId IN (SELECT Friend FROM Relationship WHERE UserId = :UserId:)";
+  $relations = $app->modelsManager->executeQuery($phql,array(
+    'UserId' => $UserId 
+  ));
+
+  $data = array();
+  foreach($relations as $relation){
+    $data[] = array(
+    'UserId' => $relation->UserId,
+    'Friend' => $relation->Friend
+   );
+  }
+  echo json_encode($data);
+
+});
+
+//GET comments
+$app->get('/api/comments',function() use($app){
+  $phql = "SELECT * FROM Comments";
+  $comments = $app->modelsManager->executeQuery($phql);
+  $data = array();
+  foreach($comments as $comment){
+    $data[] = array(
+      'PostId' => $comment->PostId,
+      'Author' => $comment->Author,
+      'Recipient' => $comment->Recipient,
+      'Content' => $comment->Content,
+      'Sendtime' => $comment->Sendtime
+    );
+  }
+  echo json_encode($data);
+});
+//GET Comments by postid
+$app->get('/api/comments/{PostId}',function($PostId) use ($app){
+
+  $phql = "SELECT * FROM Comments WHERE PostId = :PostId:";
+  $comments = $app->modelsManager->executeQuery($phql,array(
+    'PostId' => $PostId 
+  ));
+
+  $data = array();
+  foreach($comments as $comment){
+    $data[] = array(
+      'PostId' => $comment->PostId,
+      'Author' => $comment->Author,
+      'Recipient' => $comment->Recipient,
+      'Content' => $comment->Content,
+      'Sendtime' => $comment->Sendtime
+   );
+  }
+  echo json_encode($data);
+
+});
+
+//post comments
+$app->post('/api/comments',function() use ($app){
+  $comment = $app->request->getJsonRawBody();
+
+  $phql = "INSERT INTO Comments (PostId, Author, Recipient, Content, Sendtime) VALUES (:PostId:, :Author:, :Recipient:, :Content:, :Sendtime:)";
+  $status = $app->modelsManager->executeQuery($phql,array(
+      'PostId' => $comment->PostId,
+      'Author' => $comment->Author,
+      'Recipient' => $comment->Recipient,
+      'Content' => $comment->Content,
+      'Sendtime' => $comment->Sendtime
+  ));
+
+  $response = new Phalcon\Http\Response();
+  if($status->success() == true){
+    $response->setStatusCode(201,'Create New Comments');
+    $comment->PostId = $status->getModel()->PostId;
+
+    $response->setJsonContent(array('status'=>'ok','data'=>$comment));
+  }else{
+    $response->setStatusCode(409,'Conflict');
+
+    $errors = array();
+    foreach($status->getMessages() as $message){
+      $errors[] = $message->getMessage();
+    }
+    $response->setJsonContent(array('status'=>'ERROR','data'=>$errors));
+  }
+  return $response;
+
+});
 
 
 $app->handle();

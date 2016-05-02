@@ -1,8 +1,8 @@
 (function () {
     'use strict';
 
-    var app = angular
-        .module('app', ['ngRoute', 'ngCookies'])
+    angular
+        .module('app', ['ngRoute', 'ngCookies', 'ngMap'])
         .config(config)
         .run(run);
     
@@ -41,9 +41,15 @@
                 templateUrl: 'profile/profile.view.html',
                 controllerAs: 'vm'
             })
+            
+            .when('/footprint/:username', {
+                controller: 'FootprintController',
+                templateUrl: 'footprint/footprint.view.html',
+                controllerAs: 'vm'
+            })
 
             .otherwise({ redirectTo: '/login' });
-    }
+        }
 
     run.$inject = ['$rootScope', '$location', '$cookieStore', '$http'];
     function run($rootScope, $location, $cookieStore, $http) {

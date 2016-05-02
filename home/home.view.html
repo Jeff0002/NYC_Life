@@ -4,9 +4,9 @@
             <p class="home-welcome">Welcome to <strong>NYC Life</strong></p>
         </div>
         <div class="col-md-4">
-            <a class="btn btn-default home-btn" href="#" role="button">Profile</a>
-            <a class="btn btn-default home-btn" href="#" role="button">Friends</a>
-            <a class="btn btn-default home-btn" href="#" role="button">Messages</a>
+            <a class="btn btn-default home-btn" href="#/home/{{username}}" role="button">Home</a>
+            <a class="btn btn-default home-btn" href="#/footprint/{{username}}" role="button">Footprint</a>
+            <a class="btn btn-default home-btn" href="#" role="button">Chat</a>
         </div>
         
     </div>
@@ -29,9 +29,8 @@
                 <p class="home-h2">My Friends</p>
                 <li ng-repeat='friend in friends' class='list-group-item'>
                     <!--friend.img-->
-                    <strong>{{friend.username}}</strong>
+                    <a href="#/profile/{{username}}/{{friend}}"><strong>{{friend}}</strong></a>
                 </li>
-
             </div>
         </div>
         <div class="col-md-4">
@@ -82,14 +81,9 @@
                 <p class="home-h2">You may know them...</p>
                 <li ng-repeat='person in peopleMayKnow' class='list-group-item'>
                     <!--friend.img-->
-                    <strong>{{person.username}}</strong>
+                    <a href="#/profile/{{username}}/{{person}}"><strong>{{person}}</strong></a>
                 </li>
             </div>
-            <div class="row">
-                <ui-gmap-google-map center='map.center' zoom='map.zoom'></ui-gmap-google-map>
-            </div>
-
-
         </div>
     </div>
 
