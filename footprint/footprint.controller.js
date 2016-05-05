@@ -20,6 +20,20 @@
                     //console.log(response.data);
         $scope.profile = response.data[0];
         });
+            
+        $http.get('http://localhost:8888/api/relationship/' + $routeParams.username).then(function(response) {
+        //$scope.friends = response.data;
+        //console.log(response.data);
+        $scope.friends = [];
+        for (var i = 0; i < response.data.length; i++) {
+            $scope.friends.push(response.data[i].Friend);
+        }
+        //console.log($scope.friends);
+        });
+            
+        $http.get('http://localhost:8888/api/news/'+$routeParams.username).then(function(response) {
+            console.log(response.data);
+        })
     }]);
 
 })();

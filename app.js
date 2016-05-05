@@ -36,6 +36,12 @@
                 controllerAs: 'vm'
             })
         
+            .when('/edit/:username', {
+                controller: 'EditController',
+                templateUrl: 'edit/edit.view.html',
+                controllerAs: 'vm'
+            })
+        
             .when('/profile/:visitor/:host', {
                 controller: 'ProfileController',
                 templateUrl: 'profile/profile.view.html',

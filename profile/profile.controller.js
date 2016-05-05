@@ -16,7 +16,6 @@
                 $http.get('http://localhost:8888/api/user/' + $scope.username).then(function(response) {
                     //console.log(response.data);
                     $scope.profile = response.data[0];
-                    //console.log($scope.profile);
                 });
                 
                 /* for test
@@ -117,6 +116,25 @@
                     }
                     console.log($scope.comments);
                 };
+                
+                $scope.checkFriend = function(visitor, username) {
+                    console.log("check");
+                    console.log(visitor + username);
+                    return false;
+                };
+                
+                $scope.addFriend = function(visitor, username) {
+                    var invitation = {};
+                    invitation.UserId = username;
+                    invitation.Invitor = visitor;
+                    $http.post('http://localhost:8888/api/invite', invitation).then(function(response){
+                        console.log(response.status);
+                    })
+                    $scope.sent = true;
+                    console.log("add");
+                    console.log(visitor + username);
+                };
+                
                 }]);
 
 })();  

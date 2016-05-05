@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular
@@ -13,6 +13,9 @@
 
         function register() {
             vm.dataLoading = true;
+            vm.user.Image="https://upload.wikimedia.org/wikipedia/en/thumb/c/ce/User-info.svg/1024px-User-info.svg.png";
+            vm.user.Starttime = new Date();
+            //console.log(vm.user);
             UserService.Create(vm.user)
                 .then(function (response) {
                     if (response.success) {

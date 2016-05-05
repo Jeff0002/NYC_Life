@@ -25,8 +25,11 @@
                 </div>
             </div>
             <div class="row home-friendlist img-rounded">
-                <p class="home-h2">My Friends</p>
-                <li ng-repeat='friend in friends' class='list-group-item'>
+                <p class="home-h2">My Friends </p>
+                <div class="row search-bar">
+                    <p><strong>Search</strong><input ng-model="searchFriend"></p>
+                </div>
+                <li ng-repeat='friend in friends | filter: searchFriend' class='list-group-item'>
                     <!--friend.img-->
                     <a href="#/profile/{{username}}/{{friend}}"><strong>{{friend}}</strong></a>
                 </li>

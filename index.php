@@ -95,27 +95,32 @@ $app->post('/api/user',function() use ($app){
   return $response;
 
 });
-
+//echo json_encode('load');
 //Update User
 $app->put('/api/user/{UserId}',function($UserId) use ($app){
+//echo json_encode('success');
   $user = $app->request->getJsonRawBody();
-  $phql = "UPDATE User SET UserId = :UserId:, Age = :Age:, Image = :Image:, Zipcode = :Zipcode:, Email = :Email:, Password = :Password:, Starttime = :Starttime: WHERE UserId = :UserId: ";
+  //echo json_encode($user);
+  $phql = "UPDATE User SET Age = :Age:, Image = :Image:, Zipcode = :Zipcode:, Email = :Email:, Password = :Password:, Starttime = :Starttime: WHERE UserId = :UserId:";
   $status = $app->modelsManager->executeQuery($phql,array(
-    'UserId' => $user->UserId,
+    'UserId' => $UserId,
     'Age' => $user->Age,
     'Image' => $user->Image,
     'Zipcode' => $user->Zipcode,
     'Email' => $user->Email,
-         'Starttime' => $user->Starttime
+    'Password' => $user->Password,
+    'Starttime' => $user->Starttime
   ));
+  //echo json_encode($status->success());
 // Create a response
-    $response = new Response();
+    $response = new \Phalcon\Http\Response();
 
     // Check if the insertion was successful
     if ($status->success() == true) {
         $response->setJsonContent(
             array(
-                'status' => 'OK'
+                'status' => 'OK',
+                'data' => $user
             )
         );
     } else {
@@ -172,9 +177,9 @@ $app->get('/api/news',function() use($app){
     $data[] = array(
     'PostId' => $new->PostId,
     'UserId' => $new->UserId,
-    'Entry' => $new->Entry,
     'Image' => $new->Image,
     'Video' => $new->Video,
+    'Entry' => $new->Entry,
     'Posttime' => $new->Posttime,
     'LocationId' => $new->LocationId,
     'Setting' => $new->Setting,
@@ -196,9 +201,9 @@ $app->get('/api/news/{UserId}',function($UserId) use ($app){
     $data[] = array(
     'PostId' => $new->PostId,
     'UserId' => $new->UserId,
-    'Entry' => $new->Entry,
     'Image' => $new->Image,
     'Video' => $new->Video,
+    'Entry' => $new->Entry,
     'Posttime' => $new->Posttime,
     'LocationId' => $new->LocationId,
     'Setting' => $new->Setting,
@@ -207,17 +212,126 @@ $app->get('/api/news/{UserId}',function($UserId) use ($app){
   }
   echo json_encode($data);
 });
+//GET post by setting
+$app->get('/api/public/news',function($UserId) use ($app){
+
+//   $phql = "SELECT * FROM News WHERE UserId IN (
+// SELECT Friend From Relationship WHERE UserId = :UserId:)";
+ $phql = "SELECT * FROM News WHERE Setting = 'Public'";
+  $news = $app->modelsManager->executeQuery($phql,array(
+    'UserId' => $UserId 
+  ));
+
+  $data = array();
+  foreach($news as $new){
+    $data[] = array(
+    'PostId' => $new->PostId,
+    'UserId' => $new->UserId,
+    'Image' => $new->Image,
+    'Video' => $new->Video,
+    'Entry' => $new->Entry,
+    'Posttime' => $new->Posttime,
+    'LocationId' => $new->LocationId,
+    'Setting' => $new->Setting,
+    'Ilikeit' => $new->Ilikeit
+   );
+  }
+  echo json_encode($data);
+});
+//GET post by postID
+$app->get('/api/news/{PostId}',function($PostId) use ($app){
+
+  $phql = "SELECT * FROM News WHERE PostId = :PostId: ORDER BY PostId";
+  $news = $app->modelsManager->executeQuery($phql,array(
+    'PostId' => $PostId
+  ));
+
+  $data = array();
+  foreach($news as $new){
+    $data[] = array(
+    'PostId' => $new->PostId,
+    'UserId' => $new->UserId,
+    'Image' => $new->Image,
+    'Video' => $new->Video,
+    'Entry' => $new->Entry,
+    'Posttime' => $new->Posttime,
+    'LocationId' => $new->LocationId,
+    'Setting' => $new->Setting,
+    'Ilikeit' => $new->Ilikeit
+   );
+  }
+  echo json_encode($data);
+});
+//echo json_encode('load');
+
+
+
+//Update Post
+$app->put('/api/news/{PostId}',function($PostId) use ($app){
+//echo json_encode('success');
+  $news = $app->request->getJsonRawBody();
+  //echo json_encode($user);
+  $phql = "UPDATE News SET UserId = :UserId:, Image = :Image:, Video = :Video:, Entry = :Entry:, Posttime = :Posttime:, LocationId = :LocationId:, Setting = :Setting:, Ilikeit = :Ilikeit: WHERE PostId = :PostId:";
+  $status = $app->modelsManager->executeQuery($phql, array(
+    'PostId' => $PostId,
+    'UserId' => $news->UserId,
+    'Image' => $news->Image,
+    'Video' => $news->Video,
+    'Entry' => $news->Entry,
+    'Posttime' => $news->Posttime,
+    'LocationId' => $news->LocationId,
+    'Setting' => $news->Setting,
+    'Ilikeit' => $news->Ilikeit
+  ));  
+  //echo json_encode($status->success());
+// Create a response
+    $response = new \Phalcon\Http\Response();
+
+    // Check if the insertion was successful
+    if ($status->success() == true) {
+        $response->setJsonContent(
+            array(
+                'status' => 'OK',
+                'data' => $news
+            )
+        );
+    } else {
+
+        // Change the HTTP status
+        $response->setStatusCode(409, "Conflict");
+
+        $errors = array();
+        foreach ($status->getMessages() as $message) {
+            $errors[] = $message->getMessage();
+        }
+
+        $response->setJsonContent(
+            array(
+                'status'   => 'ERROR',
+                'messages' => $errors
+            )
+        );
+    }
+
+    return $response;
+
+});
+
+
+
+
+
 
 //Post Post
 $app->post('/api/news',function() use ($app){
   $news = $app->request->getJsonRawBody();
-  $phql = "INSERT INTO News (PostId, UserId, Entry, Image, Video, Posttime, LocationId, Setting, Ilikeit) VALUES (:PostId:, :UserId:, :Entry:, :Image:, :Video:, :Posttime:, :LocationId:, :Setting:, :Ilikeit:)";
+  $phql = "INSERT INTO News (PostId, UserId, Image, Video, Entry, Posttime, LocationId, Setting, Ilikeit) VALUES (:PostId:, :UserId:, :Image:, :Video:, :Entry:, :Posttime:, :LocationId:, :Setting:, :Ilikeit:)";
   $status = $app->modelsManager->executeQuery($phql,array(
     'PostId' => $news->PostId,
     'UserId' => $news->UserId,
-    'Entry' => $news->Entry,
     'Image' => $news->Image,
     'Video' => $news->Video,
+    'Entry' => $news->Entry,
     'Posttime' => $news->Posttime,
     'LocationId' => $news->LocationId,
     'Setting' => $news->Setting,
@@ -233,7 +347,7 @@ $app->post('/api/news',function() use ($app){
         $response->setJsonContent(
             array(
                 'status' => 'OK',
-                'data'   => $news
+                'data'   => $new
             )
         );
 
@@ -316,6 +430,19 @@ $app->post('/api/local',function() use ($app){
 
 });
 
+//Get post location
+$app->get('/api/local/{UserId}',function($UserId) use($app){
+  $phql = "SELECT * FROM News join Location WHERE UserId = :UserId:";
+  $locals = $app->modelsManager->executeQuery($phql);
+  $data = array();
+  foreach($locals as $local){
+    $data[] = array(
+    'UserId' => $UserId
+    );
+  }
+  echo json_encode($data);
+});
+
 
 
 //GET friendship
@@ -393,7 +520,7 @@ $app->get('/api/relationship/{UserId}',function($UserId) use ($app){
 //get friend from user's friend
 $app->get('/api/relationship/friend/{UserId}',function($UserId) use ($app){
 
-  $phql = "SELECT * FROM Relationship WHERE UserId IN (SELECT Friend FROM Relationship WHERE UserId = :UserId:)";
+  $phql = "SELECT DISTINCT Friend FROM Relationship WHERE UserId IN (SELECT Friend FROM Relationship WHERE UserId = :UserId:) and Friend not in (SELECT Friend FROM Relationship WHERE UserId = :UserId:) and Friend != :UserId:";
   $relations = $app->modelsManager->executeQuery($phql,array(
     'UserId' => $UserId 
   ));
@@ -401,13 +528,86 @@ $app->get('/api/relationship/friend/{UserId}',function($UserId) use ($app){
   $data = array();
   foreach($relations as $relation){
     $data[] = array(
-    'UserId' => $relation->UserId,
     'Friend' => $relation->Friend
    );
   }
   echo json_encode($data);
 
 });
+
+
+//GET request
+$app->get('/api/invite',function() use($app){
+  $phql = "SELECT * FROM Invitation";
+  $invites = $app->modelsManager->executeQuery($phql);
+  $data = array();
+  foreach($invites as $invite){
+    $data[] = array(
+      'UserId' => $invite->UserId,
+      'Invitor' => $invite->Invitor
+    );
+  }
+  echo json_encode($data);
+});
+
+//get request by name
+$app->get('/api/invite/{UserId}',function($UserId) use ($app){
+
+  $phql = "SELECT * FROM Invitation Where UserId = :UserId:";
+  $invites = $app->modelsManager->executeQuery($phql,array(
+    'UserId' => $UserId 
+  ));
+
+  $data = array();
+  foreach($invites as $invite){
+    $data[] = array(
+    'Invitor' => $invite->Invitor
+   );
+  }
+  echo json_encode($data);
+
+});
+
+//post request
+$app->post('/api/invite',function() use ($app){
+  $invite = $app->request->getJsonRawBody();
+  $phql = "INSERT INTO Invitation (UserId, Invitor) VALUES (:UserId:, :Invitor:)";
+  $status = $app->modelsManager->executeQuery($phql,array(
+    'UserId' => $invite->UserId,
+    'Invitor' => $invite->Invitor
+  ));
+
+  $response = new Phalcon\Http\Response();
+    if ($status->success() == true) {
+        $response->setStatusCode(201, "Created");
+
+
+        $response->setJsonContent(
+            array(
+                'status' => 'OK',
+                'data'   => $invite
+            )
+        );
+
+    } else {
+        $response->setStatusCode(409, "Conflict");
+        $errors = array();
+        foreach ($status->getMessages() as $message) {
+            $errors[] = $message->getMessage();
+        }
+
+        $response->setJsonContent(
+            array(
+                'status'   => 'ERROR',
+                'messages' => $errors
+            )
+        );
+    }
+
+    return $response;
+
+});
+
 
 //GET comments
 $app->get('/api/comments',function() use($app){

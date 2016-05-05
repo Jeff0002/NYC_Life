@@ -13,7 +13,9 @@
         <div class="col-md-4">
             <div class="row home-profile img-rounded">
                 <div class="col-md-6">
-                    <img class='img-face' src="https://deaenij3kiw8r.cloudfront.net/system/users/avatars/141380/original/production-b3612f96cc66fee631be82853dd2c316-man_bartlett_bw.jpg?1369799811" alt="user_pic">
+                    <img class='img-face' src="{{profile.Image}}" alt="user_pic">
+                    <button ng-hide = 'checkFriend(visitor, username)' ng-click = 'addFriend(visitor, username)'>Add Friend</button>
+                    <p ng-show = 'sent'>Invitation has been sent</p>
                 </div>
                 <div class="col-md-6">
                     <p class="home-profile-special">{{profile.UserId}}</p>

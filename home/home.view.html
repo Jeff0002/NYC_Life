@@ -6,15 +6,17 @@
         <div class="col-md-4">
             <a class="btn btn-default home-btn" href="#/home/{{username}}" role="button">Home</a>
             <a class="btn btn-default home-btn" href="#/footprint/{{username}}" role="button">Footprint</a>
-            <a class="btn btn-default home-btn" href="#" role="button">Chat</a>
         </div>
         
     </div>
     <div class="row">
         <div class="col-md-4">
             <div class="row home-profile img-rounded">
+                <div>
+                    <a href="#/edit/{{username}}"><strong>Edit</strong></a>
+                </div>
                 <div class="col-md-6">
-                    <img class='img-face' src="https://deaenij3kiw8r.cloudfront.net/system/users/avatars/141380/original/production-b3612f96cc66fee631be82853dd2c316-man_bartlett_bw.jpg?1369799811" alt="user_pic">
+                    <img class='img-face' src="{{profile.Image}}" alt="user_pic">
                 </div>
                 <div class="col-md-6">
                     <p class="home-profile-special">{{profile.UserId}}</p>
@@ -26,8 +28,11 @@
                 </div>
             </div>
             <div class="row home-friendlist img-rounded">
-                <p class="home-h2">My Friends</p>
-                <li ng-repeat='friend in friends' class='list-group-item'>
+                <p class="home-h2">My Friends </p>
+                <div class="row search-bar">
+                    <p><strong>Search</strong><input ng-model="searchFriend"></p>
+                </div>
+                <li ng-repeat='friend in friends | filter: searchFriend' class='list-group-item'>
                     <!--friend.img-->
                     <a href="#/profile/{{username}}/{{friend}}"><strong>{{friend}}</strong></a>
                 </li>
@@ -36,27 +41,60 @@
         <div class="col-md-4">
             <div class="row home-posts img-rounded">
                 <p class="home-h2">What's happening now</p>
-                <input ng-model='postBody' class='form-control' />
+                <input ng-model='postBody' class='form-control' />   
+                <span ng-show='image' class="glyphicon glyphicon-camera" aria-hidden="true">&nbsp;<input ng-model='postImage' class='form-contrl'/></span>
+                    
+                <span ng-show='video' class="glyphicon glyphicon-film" aria-hidden="true">&nbsp;<input ng-model='postVideo' class='form-contrl'/></span>
+                
+                <span ng-show='location' class="glyphicon glyphicon-map-marker" aria-hidden="true">&nbsp;<input ng-model='postLocation' class='form-contrl'/><a class="btn-nice" ng-click='getLocation(postLocation)'>Yes</a></span>
+                <p ng-show="showLocation">Your address is [{{locationInfo.lat}}, {{locationInfo.lng}}]</p>
+                    
+                <div class="row home-post-image">
+                    <a class="btn-nice" ng-click = 'hasImage()'>Image</a>
+                    <span>&nbsp;&nbsp;</span>
+                    <a class="btn-nice" ng-click = 'hasVideo()'>Video</a>
+                    <span>&nbsp;&nbsp;</span>
+                    <a class="btn-nice" ng-click = 'hasLocation()'>Check In</a>
+                    <span>&nbsp;&nbsp;</span>
+                    
+                    <a class="btn-nice" href="">Public</a>
+                    <input type="checkbox" ng-model="postSetting"/>
+                </div>
                 <button ng-click='addPost()' class='btn btn-default'>Post</button>
+                <div class="row search-bar">
+                    <p><strong>Search</strong><input ng-model="searchPost"></p>
+                </div>
                 <ul class='list-group'>
-                    <li ng-repeat='post in posts' class='list-group-item'>
-                        <strong>{{post.username}}</strong>
-                        <span>{{post.body}}</span>
+                    <li ng-repeat="post in posts | filter: searchPost | orderBy: '-Posttime'" ng-init='getComments(post)' class='list-group-item'>
+                        <p><strong>{{post.UserId}}</strong>
+                        <span class="home-posttime">{{post.Posttime}}</span></p>
+                        <p>{{post.Entry}}</p>
                         <!--<postDirective></postDirective>-->
                         <!--                        <span>{{post.video}}</span>-->
-                        <iframe id="post-video" width="90%" height="auto" ng-src="{{trustSrc(post.video)}}" ng-hide="post.video ==''" frameborder="0" allowfullscreen></iframe>
+                        <iframe id="post-video" width="90%" height="auto" ng-src="{{trustSrc(post.Video)}}" ng-hide="post.Video == ''" frameborder="0" allowfullscreen></iframe>
 <!--                        <span>{{post.img}}</span>-->
-                        <img id="post-img" src="{{post.img}}" ng-hide="post.img == ''" style="width:90%; height:auto;">
+                        <img id="post-img" src="{{post.Image}}" ng-hide="post.Image == ''" style="width:90%; height:auto;">
+                        <div class="row home-post-like">
+                            <a class="btn-nice" ng-click = 'like(post.PostId)'>Like</a>
+                            <span> / </span>
+                            <a class="btn-nice" ng-click = 'dislike(post.PostId)'>Dislike</a>
+                            <span class="badge">{{post.Ilikeit}}</span>
+                            <span>&nbsp;&nbsp;</span>
+                            <a class="btn-nice" href="">Comment</a>
+                            <span>&nbsp;&nbsp;</span>
+                            <a class="btn-nice" href="">Share</a>
+                        </div>                    
+                        
                         <div class="row">
                             <div class="col-md-3" style="height:50px">
-                                <img class='img-face-small' src="https://deaenij3kiw8r.cloudfront.net/system/users/avatars/141380/original/production-b3612f96cc66fee631be82853dd2c316-man_bartlett_bw.jpg?1369799811">
+                                <img class='img-face-small' src="{{profile.Image}}">
                             </div>
                             <div class="col-md-9" style="height:50px; vertical-align:middle;">
                                 <div class="input-group">
-                                    <input ng-model='vm.commentBody' class='form-control' />
+                                    <input ng-model='comment.Content' class='form-control' />
                                     <span class="input-group-btn">
                                         <!--addComment(post.user, post.postId)-->
-                                        <button ng-click='addComment()' class="btn btn-default">Yes</button>
+                                        <button ng-click='addComment(post.PostId, post.UserId)' class="btn btn-default">Yes</button>
                                     </span>
                                 </div>
                                 <!-- /input-group -->
@@ -65,9 +103,10 @@
 
                         <div class="row">
                             <ul class='list-group'>
-                                <li ng-repeat='comment in comments' class='list-group-item'>
-                                    <strong>{{username}}@{{post.username}}</strong>
-                                    <span>{{comment.body}}</span>
+                                <li ng-repeat="comment in post.comments | orderBy: '-Sendtime'" class='list-group-item'>
+                                    <strong>{{comment.Author}}@{{comment.Recipient}}</strong>
+                                    <span class="home-posttime">{{comment.Sendtime}}</span>
+                                    <p>{{comment.Content}}</p>
                                 </li>
                             </ul>
                         </div>
@@ -77,6 +116,13 @@
 
         </div>
         <div class="col-md-4">
+            <div class="row home-message img-rounded">
+                <p class="home-h2">Message</p>
+                <li ng-repeat='invitor in invitors' class='list-group-item'>
+                    <p><strong>{{invitor.Invitor}}</strong> send you an friend invitation</p>
+                    <p><a ng-click = 'accept(username, invitor.Invitor)'> Accept  </a>  <a>  Reject </a></p>
+                </li>
+            </div>
             <div class="row home-peopleMayKnow img-rounded">
                 <p class="home-h2">You may know them...</p>
                 <li ng-repeat='person in peopleMayKnow' class='list-group-item'>

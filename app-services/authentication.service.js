@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular
@@ -19,26 +19,33 @@
 
             /* Dummy authentication for testing, uses $timeout to simulate api call
              ----------------------------------------------*/
-            $timeout(function () {
-                var response;
-                UserService.GetByUsername(username)
-                    .then(function (user) {
-                        if (user !== null && user.password === password) {
-                            response = { success: true };
-                        } else {
-                            response = { success: false, message: 'Username or password is incorrect' };
-                        }
-                        callback(response);
-                    });
-            }, 1000);
+//            $timeout(function () {
+//                var response;
+//                UserService.GetByUsername(username)
+//                    .then(function (user) {
+//                        if (user !== null && user.password === password) {
+//                            response = { success: true };
+//                        } else {
+//                            response = { success: false, message: 'Username or password is incorrect' };
+//                        }
+//                        callback(response);
+//                    });
+//            }, 1000);
 
             /* Use this for real authentication
              ----------------------------------------------*/
-            //$http.post('/api/authenticate', { username: username, password: password })
-            //    .success(function (response) {
-            //        callback(response);
-            //    });
-
+            var response;
+            UserService.GetByUsername(username)
+            .then(function(user) {
+                //console.log(password);
+                //console.log(user[0].Password);
+                if (user !== null && user[0].Password == password) {
+                    response = {success: true};
+                } else {
+                    response = {success : false, message: 'Username or password is incorrect' };
+                }
+                callback(response);
+            })
         }
 
         function SetCredentials(username, password) {

@@ -33,6 +33,10 @@ body {
     
 }
 
+.btn-pic {
+    margin-top: 50px;
+}
+
 .home-bar {
     background-color: #86c6c6;
 }
@@ -61,8 +65,8 @@ body {
 }
 
 .home-profile {
-    margin-left: 20px;
-    margin-right: 10px;
+    margin-left: 15px;
+    margin-right: 15px;
     margin-top: 30px;
     width: 100%; 
     height: auto;
@@ -84,8 +88,8 @@ body {
 }
 
 .home-friendlist {
-    margin-left: 20px;
-    margin-right: 10px;
+    margin-left: 15px;
+    margin-right: 15px;
     margin-top:30px;
     width: 100%; 
     height: auto; 
@@ -99,12 +103,40 @@ body {
 }
 */
 
-.home-posts, .home-peopleMayKnow, .footprint-map, .footprint-location{
-    margin-left: 20px;
-    margin-right: 10px;
+.home-posts, .home-peopleMayKnow, .footprint-map, .footprint-location, .home-message{
+    margin-left: 15px;
+    margin-right: 15px;
     margin-top: 30px;
+}
+
+.home-posttime {
+    font-size: 12px;
+    text-align: right;
+}
+
+.badge {
+    background-color: crimson;
+}
+
+.home-post-like{
+    margin-left: 10px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.home-post-image{
+    margin-left: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .map {
     height: 100%;
+}
+
+.search-bar {
+    background-color: azure;
+    margin-left: 5px;
+    margin-right: 5px;
+    vertical-align:middle;
 }
