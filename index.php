@@ -62,6 +62,7 @@ $app->get('/api/user/{UserId}',function($UserId) use ($app){
   echo json_encode($data);
 
 });
+
 //POST User
 $app->post('/api/user',function() use ($app){
   $user = $app->request->getJsonRawBody();
@@ -95,6 +96,8 @@ $app->post('/api/user',function() use ($app){
   return $response;
 
 });
+
+
 //echo json_encode('load');
 //Update User
 $app->put('/api/user/{UserId}',function($UserId) use ($app){
@@ -152,7 +155,7 @@ $app->delete('/api/users/{UserId}',function($UserId) use ($app){
   $status = $app->modelsManager->executeQuery($phql,array(
       'UserId' => $UserId
     ));
-
+  $response = new \Phalcon\Http\Response();
   if($status->success() == true){
     $response = array('status'=>'OK');
   }else{
@@ -182,18 +185,21 @@ $app->get('/api/news',function() use($app){
     'Entry' => $new->Entry,
     'Posttime' => $new->Posttime,
     'LocationId' => $new->LocationId,
+    'Longtitude' => $new->Longtitude,
+    'Latitude' => $new->Latitude,
     'Setting' => $new->Setting,
     'Ilikeit' => $new->Ilikeit
     );
   }
   echo json_encode($data);
 });
-//search User's Post
-$app->get('/api/news/{UserId}',function($UserId) use ($app){
 
-  $phql = "SELECT * FROM News WHERE UserId LIKE :UserId: ORDER BY UserId";
+//search User's Post
+$app->get('/api/news/order/{UserId}',function($UserId) use ($app){
+
+  $phql = "SELECT * FROM News WHERE UserId = :UserId: ORDER BY UserId";
   $news = $app->modelsManager->executeQuery($phql,array(
-    'UserId' => '%'. $UserId .'%'
+    'UserId' => $UserId 
   ));
 
   $data = array();
@@ -206,12 +212,15 @@ $app->get('/api/news/{UserId}',function($UserId) use ($app){
     'Entry' => $new->Entry,
     'Posttime' => $new->Posttime,
     'LocationId' => $new->LocationId,
+    'Longtitude' => $new->Longtitude,
+    'Latitude' => $new->Latitude,
     'Setting' => $new->Setting,
     'Ilikeit' => $new->Ilikeit
    );
   }
   echo json_encode($data);
 });
+
 //GET post by setting
 $app->get('/api/public/news',function($UserId) use ($app){
 
@@ -232,6 +241,8 @@ $app->get('/api/public/news',function($UserId) use ($app){
     'Entry' => $new->Entry,
     'Posttime' => $new->Posttime,
     'LocationId' => $new->LocationId,
+    'Longtitude' => $new->Longtitude,
+    'Latitude' => $new->Latitude,
     'Setting' => $new->Setting,
     'Ilikeit' => $new->Ilikeit
    );
@@ -256,6 +267,8 @@ $app->get('/api/news/{PostId}',function($PostId) use ($app){
     'Entry' => $new->Entry,
     'Posttime' => $new->Posttime,
     'LocationId' => $new->LocationId,
+    'Longtitude' => $new->Longtitude,
+    'Latitude' => $new->Latitude,
     'Setting' => $new->Setting,
     'Ilikeit' => $new->Ilikeit
    );
@@ -271,7 +284,7 @@ $app->put('/api/news/{PostId}',function($PostId) use ($app){
 //echo json_encode('success');
   $news = $app->request->getJsonRawBody();
   //echo json_encode($user);
-  $phql = "UPDATE News SET UserId = :UserId:, Image = :Image:, Video = :Video:, Entry = :Entry:, Posttime = :Posttime:, LocationId = :LocationId:, Setting = :Setting:, Ilikeit = :Ilikeit: WHERE PostId = :PostId:";
+  $phql = "UPDATE News SET UserId = :UserId:, Image = :Image:, Video = :Video:, Entry = :Entry:, Posttime = :Posttime:, LocationId = :LocationId:, Longtitude = :Longtitude:, Latitude = :Latitude:, Setting = :Setting:, Ilikeit = :Ilikeit: WHERE PostId = :PostId:";
   $status = $app->modelsManager->executeQuery($phql, array(
     'PostId' => $PostId,
     'UserId' => $news->UserId,
@@ -280,6 +293,8 @@ $app->put('/api/news/{PostId}',function($PostId) use ($app){
     'Entry' => $news->Entry,
     'Posttime' => $news->Posttime,
     'LocationId' => $news->LocationId,
+    'Longtitude' => $news->Longtitude,
+    'Latitude' => $news->Latitude,
     'Setting' => $news->Setting,
     'Ilikeit' => $news->Ilikeit
   ));  
@@ -325,7 +340,7 @@ $app->put('/api/news/{PostId}',function($PostId) use ($app){
 //Post Post
 $app->post('/api/news',function() use ($app){
   $news = $app->request->getJsonRawBody();
-  $phql = "INSERT INTO News (PostId, UserId, Image, Video, Entry, Posttime, LocationId, Setting, Ilikeit) VALUES (:PostId:, :UserId:, :Image:, :Video:, :Entry:, :Posttime:, :LocationId:, :Setting:, :Ilikeit:)";
+  $phql = "INSERT INTO News (PostId, UserId, Image, Video, Entry, Posttime, LocationId, Longtitude, Latitude Setting, Ilikeit) VALUES (:PostId:, :UserId:, :Image:, :Video:, :Entry:, :Posttime:, :LocationId:, :Longtitude:, :Latitude:, :Setting:, :Ilikeit:)";
   $status = $app->modelsManager->executeQuery($phql,array(
     'PostId' => $news->PostId,
     'UserId' => $news->UserId,
@@ -334,6 +349,8 @@ $app->post('/api/news',function() use ($app){
     'Entry' => $news->Entry,
     'Posttime' => $news->Posttime,
     'LocationId' => $news->LocationId,
+    'Longtitude' => $new->Longtitude,
+    'Latitude' => $new->Latitude,
     'Setting' => $news->Setting,
     'Ilikeit' => $new->Ilikeit
   ));
@@ -430,18 +447,7 @@ $app->post('/api/local',function() use ($app){
 
 });
 
-//Get post location
-$app->get('/api/local/{UserId}',function($UserId) use($app){
-  $phql = "SELECT * FROM News join Location WHERE UserId = :UserId:";
-  $locals = $app->modelsManager->executeQuery($phql);
-  $data = array();
-  foreach($locals as $local){
-    $data[] = array(
-    'UserId' => $UserId
-    );
-  }
-  echo json_encode($data);
-});
+
 
 
 
@@ -606,6 +612,29 @@ $app->post('/api/invite',function() use ($app){
 
     return $response;
 
+});
+
+//DELETE
+$app->delete('/api/invite/{UserId}/{Invitor}',function($UserId, $Invitor) use ($app){
+
+  $phql = "DELETE FROM Invitation WHERE UserId = :UserId: and Invitor = :Invitor: ";
+  $status = $app->modelsManager->executeQuery($phql,array(
+      'UserId' => $UserId,
+      'Invitor' => $Invitor
+    ));
+  $response = new \Phalcon\Http\Response();
+  if($status->success() == true){
+    $response = array('status'=>'OK');
+  }else{
+    $this->response->setStatusCode(500,'Internal Error')->setHeaders();
+
+    $errors = array();
+    foreach($status->getMessages() as $message){
+      $errors[] = $message->getMessage();
+    }
+    $response = array('status'=>'Error','data'=>$errors);
+  }
+    return $response;
 });
 
 

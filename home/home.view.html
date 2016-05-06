@@ -47,7 +47,7 @@
                 <span ng-show='video' class="glyphicon glyphicon-film" aria-hidden="true">&nbsp;<input ng-model='postVideo' class='form-contrl'/></span>
                 
                 <span ng-show='location' class="glyphicon glyphicon-map-marker" aria-hidden="true">&nbsp;<input ng-model='postLocation' class='form-contrl'/><a class="btn-nice" ng-click='getLocation(postLocation)'>Yes</a></span>
-                <p ng-show="showLocation">Your address is [{{locationInfo.lat}}, {{locationInfo.lng}}]</p>
+                <p ng-show="showLocation">Your address is [{{locations.lat}}, {{locations.lng}}]</p>
                     
                 <div class="row home-post-image">
                     <a class="btn-nice" ng-click = 'hasImage()'>Image</a>
@@ -66,7 +66,7 @@
                 </div>
                 <ul class='list-group'>
                     <li ng-repeat="post in posts | filter: searchPost | orderBy: '-Posttime'" ng-init='getComments(post)' class='list-group-item'>
-                        <p><strong>{{post.UserId}}</strong>
+                        <a href="#/profile/{{username}}/{{post.UserId}}"><strong>{{post.UserId}}</strong></a>
                         <span class="home-posttime">{{post.Posttime}}</span></p>
                         <p>{{post.Entry}}</p>
                         <!--<postDirective></postDirective>-->

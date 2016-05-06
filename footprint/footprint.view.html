@@ -36,19 +36,17 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="row footprint-map img-rounded">
-                <ng-map zoom="11" center="[40.74, -74.18]">
-                <marker position="[40.74, -74.18]" title="how" animation="Animation.BOUNCE"></marker>
-                <marker position="[40.75, -74.17]" title="are" animation="Animation.BOUNCE"></marker>
-                <marker position="[40.77, -74.15]" title="from" animation="Animation.BOUNCE"></marker>
-                <marker position="[40.78, -74.14]" title="allen" animation="Animation.BOUNCE"></marker>
+            <div class="row footprint-map img-rounded" >
+                <ng-map zoom="11" center="[40.78, -73.96]">
+                <marker ng-repeat='Location in Locations track by $index' position="[{{Location.lng}}, {{Location.lat}}]" title="how" animation="Animation.BOUNCE"></marker>
               </ng-map>
             </div>
         </div>
         <div class="col-md-4">
             <div class="row footprint-location img-rounded">
                 <p class="home-h2">Places I checked in</p>
-                <li ng-repeat='' class='list-group-item'>
+                <li ng-repeat='LocationId in LocationIds track by $index' class='list-group-item'>
+                    <a href=""><strong>{{LocationId}}</strong></a>
                 </li>
             </div>
         </div>

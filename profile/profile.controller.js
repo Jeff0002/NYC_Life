@@ -9,6 +9,7 @@
                                        
                 $scope.visitor = $routeParams.visitor;
                 $scope.username = $routeParams.host;
+                
                 $http.get("http://localhost:8888/api/user").then(function(response) {
                     $scope.test = response.data;
                 });
@@ -17,14 +18,6 @@
                     //console.log(response.data);
                     $scope.profile = response.data[0];
                 });
-                
-                /* for test
-                $scope.profile = {
-                    username: 'Jeff0003',
-                    age: 27,
-                    zipCode: "11201",
-                    duration: 4
-                };*/
                 
                 $http.get('http://localhost:8888/api/relationship/' + $scope.username).then(function(response) {
                     //$scope.friends = response.data;
@@ -35,92 +28,19 @@
                     }
                     //console.log($scope.friends);
                 });
-
-                /* test for friends
-                $scope.friends = [
-                    {
-                        username: 'Jeff0003',
-                    },
-                    {
-                        username: 'Jeff0004'
-                    }
-                ];
                 
-                */
-                
-                /*
-                $http.get('posts/' + $routeParams.username).success(function(data) {
-                    $scope.posts = data;
-                    */
-                $scope.posts = [
-                    {
-                        postId: '001',
-                        username: 'Jeff0002',
-                        body: 'Hello, Jeff0001',
-                        video: "https://www.youtube.com/embed/MtCMtC50gwY",
-                        img: ""
-                    },
-                    {
-                        postId: '002',
-                        username: 'Jeff0003',
-                        body: 'How are you, Jeff0002',
-                        video: "",
-                        img: "https://media-cdn.tripadvisor.com/media/photo-s/03/9b/2d/f2/new-york-city.jpg"
-                    },
-                    {
-                        postId: '003',
-                        username: 'Jeff0004',
-                        body: 'I\'m fine, Thanks!',
-                        video: "https://www.youtube.com/embed/Nsec4hWZz2M",
-                        img: ""
-                    }
-                ];
-                $scope.trustSrc = function(src) {
-                    return $sce.trustAsResourceUrl(src);
-                };
-
-                $scope.addPost = function() {
-                    //http post
-                    if ($scope.postBody) {
-                        $scope.posts.unshift( {
-                            username: $scope.username,
-                            body:$scope.postBody
-                        })
-                    $scope.postBody = null;
-                    }
-                };
-                
-                // http get comments/:postId
-                $scope.comments = [
-                    {
-                        postId: '001',
-                        author: "jeff001",
-                        recipient: "jeff002",
-                        body: "Hello, I like your post"
-                    }
-                ];
-                
-                //$scope.addComment = function(author, postId) {
-                $scope.addComment = function() {
-                    console.log($scope.vm.commentBody);
-                    if ($scope.vm.commentBody) {
-                        //http post postId, $scope.commentBody, @scope.username, 
-                        console.log('success');
-                        $scope.comments.unshift( {
-                            postId: "",
-                            author: $scope.username,
-                            recipient: "unknown",
-                            body: $scope.vm.commentBody
-                        })
-                    $scope.commentBody = null;
-                    }
-                    console.log($scope.comments);
-                };
                 
                 $scope.checkFriend = function(visitor, username) {
-                    console.log("check");
-                    console.log(visitor + username);
+                    //console.log("check");
+                    //console.log(visitor + username);
+//                    $http.get('http://localhost:8888/api/relationship' + visitor).then(function(response) {
+//                        console.log(response);
+//                    })
                     return false;
+                };
+                
+                $scope.trustSrc = function(src) {
+                    return $sce.trustAsResourceUrl(src);
                 };
                 
                 $scope.addFriend = function(visitor, username) {
@@ -134,6 +54,99 @@
                     console.log("add");
                     console.log(visitor + username);
                 };
+                console.log("what happend");
+                $http.get('http://localhost:8888/api/news/order/'+$routeParams.host).then(function(response) {
+                    $scope.posts = response.data;
+                     console.log(response.data);
+                    
+                    for (var i = 0; i < $scope.posts.length; i++) {
+                        if($scope.posts[i].Video == null) {
+                            $scope.posts[i].Video = '';
+                        }
+                        if($scope.posts[i].Image == null) {
+                            $scope.posts[i].Image = '';
+                        }
+                    }
+                    //console.log($scope.posts);
+                });
+                    
+
+                $scope.comment = {};
+                $scope.addComment = function(PostId, UserId) {
+                    
+                    $scope.comment.PostId = PostId;
+                    $scope.comment.Author = $scope.username;
+                    $scope.comment.Recipient = UserId;
+                    console.log($scope.comment.Content);
+                    $scope.comment.Sendtime = new Date();
+                    $http.post('http://localhost:8888/api/comments', $scope.comment).then(function(response) {
+                            console.log(response.status);
+                    })
+
+                    for (var i = 0; i < $scope.posts.length; i++) {
+                        if ($scope.posts[i].PostId == PostId) {
+                            $scope.getComments($scope.posts[i]);
+                            console.log($scope.posts[i]);
+                        }
+                    }
+                };
+                
+                $scope.getComments = function(post) {
+                    $http.get('http://localhost:8888/api/comments/'+post.PostId).then(function(response) {
+                        post.comments = response.data;
+                    })
+                    //console.log(post.comments);
+                    //console.log($scope.comments);
+                }
+                
+
+                $scope.like = function(PostId) {
+                    
+                    for (var i = 0; i < $scope.posts.length; i++) {
+                        if ($scope.posts[i].PostId == PostId) {
+                            $scope.posts[i].Ilikeit = parseInt($scope.posts[i].Ilikeit) + 1;
+                            $scope.postById = $scope.posts[i];
+                        }
+                    }
+                    //console.log($scope.posts);
+                    
+                    console.log($scope.postById);
+
+                    $http.put('http://localhost:8888/api/news/' + PostId, $scope.postById).then(function(response) {
+                        console.log(response.status);
+                    });
+                    
+                }
+                
+                $scope.dislike = function(PostId) {
+                    
+                    for (var i = 0; i < $scope.posts.length; i++) {
+                        if ($scope.posts[i].PostId == PostId) {
+                            $scope.posts[i].Ilikeit = parseInt($scope.posts[i].Ilikeit) - 1;
+                            $scope.postById = $scope.posts[i];
+                        }
+                    }
+                    console.log($scope.postById);
+
+                    $http.put('http://localhost:8888/api/news/' + PostId, $scope.postById).then(function(response) {
+                        console.log(response.status);
+                    });
+                    
+                }
+                
+                $http.get('http://localhost:8888/api/news/order/'+$routeParams.username).then(function(response) {
+                    $scope.LocationIds = [];
+                    $scope.Locations = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        console.log(response.data[i].LocationId);
+                        $scope.LocationIds.push(response.data[i].LocationId);
+                        var location = {};
+                        location.lng = response.data[i].Longtitude;
+                        location.lat = response.data[i].Latitude;
+                        $scope.Locations.push(location);
+                        console.log($scope.Locations);
+                    }
+                });
                 
                 }]);
 

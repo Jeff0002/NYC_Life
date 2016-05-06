@@ -44,6 +44,8 @@
                     }
                     //console.log($scope.friends);
                 });
+                
+                
 
                 /* test for friends
                 $scope.friends = [
@@ -114,10 +116,28 @@
                     $scope.location = !$scope.location;
                 }
                 $scope.MyGoogleApiKey = 'AIzaSyA8Obq9X1_1fzWjGzgCmAU3Zz411KBK92s';
+                $scope.locations = {};
+                //$scope.locations.lat = '33.3';
+                //$scope.locations.lng = '44.4';
                 $scope.getLocation = function(postLocation) {
-                    $http.get('https://maps.googleapis.com/maps/api/geocode/json?address='+ postLocation + '&key=' + $scope.MyGoogleApiKey).then(function(response) {
-                        $scope.locationInfo = response.data.results[0].geometry.location;
-                        console.log($scope.locationInfo);
+//                    $http.get('https://maps.googleapis.com/maps/api/geocode/json?address='+ postLocation + '&key=' + $scope.MyGoogleApiKey).then(function(response) {
+//                        $scope.locationInfo = response.data.results[0].geometry.location;
+//                        console.log($scope.locationInfo);
+//                    })
+                    var geocoder = new google.maps.Geocoder();
+                    var geocoderRequest = {address: postLocation};
+                    geocoder.geocode(geocoderRequest, function(results, status) {
+                        console.log(results);
+                        if (results[0].geometry.bounds) {
+                            var response = results[0].geometry.bounds;
+                        } else {
+                            var response = results[0].geometry.viewport;
+                        }
+                        $scope.locations.lat = (response.H.H + response.H.j) * 0.5;
+                        $scope.locations.lng = (response.j.H + response.j.j) * 0.5;
+                        
+                        console.log($scope.locations.lat);
+                        console.log($scope.locations.lng);
                     })
                     $scope.showLocation = 'true';
                 }
@@ -146,8 +166,8 @@
                     news.Entry = $scope.postBody;
                     news.Posttime = new Date();
                     news.LocationId = $scope.postLocation;
-                    news.Longtitude = $scope.locationInfo.lng;
-                    news.Latitude = $scope.locationInfo.lat;
+                    news.Longtitude = $scope.locations.lng.toString();
+                    news.Latitude = $scope.locations.lat.toString();
                     if ($scope.postSetting == true) {
                         news.Setting = 'Public';
                     } else {
@@ -200,7 +220,7 @@
                     $http.get('http://localhost:8888/api/comments/'+post.PostId).then(function(response) {
                         post.comments = response.data;
                     })
-                    console.log(post.comments);
+                    //console.log(post.comments);
                     //console.log($scope.comments);
                 }
                 /*
@@ -220,37 +240,57 @@
                     //console.log($scope.invitors[2].Invitor);
                     
                 })
-                
                 $scope.accept = function(UserId, Invitor) {
                     console.log(UserId + Invitor);
                     var relationship = {};
                     relationship.UserId = UserId;
                     relationship.Friend = Invitor;
                     console.log(relationship);
-                    
+                    $http.delete('http://localhost:8888/api/invite/'+UserId+'/'+Invitor).then(function(response) {
+                        console.log(response.status);
+                    })
                     $http.post('http://localhost:8888/api/relationship', relationship).then(function(response){
                         console.log(response.status);
                     })
+                    
+                    $http.get('http://localhost:8888/api/invite/' + $routeParams.username).then(function(response) {
+                    $scope.invitors = response.data;
+                    //console.log($scope.invitors[2].Invitor);
+                        
+                    $http.get('http://localhost:8888/api/relationship/' + $routeParams.username).then(function(response) {
+                    //$scope.friends = response.data;
+                    //console.log(response.data);
+                    $scope.friends = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        $scope.friends.push(response.data[i].Friend);
+                    }
+                    //console.log($scope.friends);
+                });
+                    
+                })
+                    
+                    
+                }
+                
+                $scope.reject = function(UserId, Invitor) {
+                    $http.delete('http://localhost:8888/api/invite/'+UserId+'/'+Invitor).then(function(response) {
+                        console.log(response.status);
+                    }) 
                 }
                 
                 $scope.like = function(PostId) {
                     
-//                    $http.get('http://localhost:8888/api/news/'+PostId).then(function(response) {
-//                        $scope.postById = response.data;
-//                    });
-//                    console.log($scope.postById);
-//                    console.log($scope.postById[0]);
-//                    console.log($scope.postById[0].Ilikeit);
-//                    $scope.postById[0].Ilikeit += 1;
-//                    $http.put('http://localhost:8888/api/news/' + PostId).then(function(response) {
-//                        console.log(response.status);
-//                    });
                     for (var i = 0; i < $scope.posts.length; i++) {
                         if ($scope.posts[i].PostId == PostId) {
                             $scope.posts[i].Ilikeit = parseInt($scope.posts[i].Ilikeit) + 1;
+                            $scope.postById = $scope.posts[i];
                         }
                     }
-                    console.log($scope.posts);
+                    //console.log($scope.posts);
+                    
+                    console.log($scope.postById);
+
+                    
                     
                 }
                 
@@ -269,11 +309,20 @@
                     for (var i = 0; i < $scope.posts.length; i++) {
                         if ($scope.posts[i].PostId == PostId) {
                             $scope.posts[i].Ilikeit = parseInt($scope.posts[i].Ilikeit) - 1;
+                            $scope.postById = $scope.posts[i];
                         }
                     }
-                    console.log($scope.posts);
+                    console.log($scope.postById);
+
+                    $http.put('http://localhost:8888/api/news/' + PostId, $scope.postById).then(function(response) {
+                        console.log(response.status);
+                    });
                     
                 }
+                
+                
+                
+                
                 }]);
     
 

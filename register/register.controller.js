@@ -18,13 +18,13 @@
             //console.log(vm.user);
             UserService.Create(vm.user)
                 .then(function (response) {
-                    if (response.success) {
+//                    if (response.success) {
                         FlashService.Success('Registration successful', true);
                         $location.path('/login');
-                    } else {
-                        FlashService.Error(response.message);
-                        vm.dataLoading = false;
-                    }
+//                    } else {
+//                        FlashService.Error(response.message);
+//                        vm.dataLoading = false;
+//                    }
                 });
         }
     }
