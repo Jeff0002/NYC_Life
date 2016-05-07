@@ -335,26 +335,25 @@ $app->put('/api/news/{PostId}',function($PostId) use ($app){
 
 
 
-
-
 //Post Post
 $app->post('/api/news',function() use ($app){
-  $news = $app->request->getJsonRawBody();
-  $phql = "INSERT INTO News (PostId, UserId, Image, Video, Entry, Posttime, LocationId, Longtitude, Latitude Setting, Ilikeit) VALUES (:PostId:, :UserId:, :Image:, :Video:, :Entry:, :Posttime:, :LocationId:, :Longtitude:, :Latitude:, :Setting:, :Ilikeit:)";
+  $new = $app->request->getJsonRawBody();
+  $phql = "INSERT INTO News (PostId, UserId, Image, Video, Entry, Posttime, LocationId, Longtitude, Latitude, Setting, Ilikeit) VALUES (:PostId:, :UserId:, :Image:, :Video:, :Entry:, :Posttime:, :LocationId:, :Longtitude:, :Latitude:, :Setting:, :Ilikeit:)";
   $status = $app->modelsManager->executeQuery($phql,array(
-    'PostId' => $news->PostId,
-    'UserId' => $news->UserId,
-    'Image' => $news->Image,
-    'Video' => $news->Video,
-    'Entry' => $news->Entry,
-    'Posttime' => $news->Posttime,
-    'LocationId' => $news->LocationId,
+    'PostId' => $new->PostId,
+    'UserId' => $new->UserId,
+    'Image' => $new->Image,
+    'Video' => $new->Video,
+    'Entry' => $new->Entry,
+    'Posttime' => $new->Posttime,
+    'LocationId' => $new->LocationId,
     'Longtitude' => $new->Longtitude,
     'Latitude' => $new->Latitude,
-    'Setting' => $news->Setting,
+    'Setting' => $new->Setting,
     'Ilikeit' => $new->Ilikeit
   ));
 
+//  echo json_encode($status->success());
   $response = new Phalcon\Http\Response();
     if ($status->success() == true) {
         $response->setStatusCode(201, "Created");

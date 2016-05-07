@@ -134,7 +134,7 @@
                     
                 }
                 
-                $http.get('http://localhost:8888/api/news/order/'+$routeParams.username).then(function(response) {
+                $http.get('http://localhost:8888/api/news/order/'+$routeParams.host).then(function(response) {
                     $scope.LocationIds = [];
                     $scope.Locations = [];
                     for (var i = 0; i < response.data.length; i++) {

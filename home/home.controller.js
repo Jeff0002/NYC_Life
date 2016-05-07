@@ -177,7 +177,22 @@
                     console.log(news);
                     $http.post('http://localhost:8888/api/news', news).then(function(response) {
                         console.log(response.status);
+                        $http.get('http://localhost:8888/api/public/news').then(function(response) {
+                    $scope.posts = response.data;
+                    
+                    for (var i = 0; i < $scope.posts.length; i++) {
+                        if($scope.posts[i].Video == null) {
+                            $scope.posts[i].Video = '';
+                        }
+                        if($scope.posts[i].Image == null) {
+                            $scope.posts[i].Image = '';
+                        }
+                    }
+                    //console.log($scope.posts);
+                });
                     })
+                    
+                    
                 };
                 
                 $scope.comment = {};
