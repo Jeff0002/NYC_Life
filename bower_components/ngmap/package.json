@@ -2,7 +2,7 @@
   "name": "ngmap",
   "version": "1.17.3",
   "main": "build/scripts/ng-map.js",
-  "description": "The Simplest AngularJS Google Maps V3 Directive",
+  "description": "NYC Life",
   "repository": {
     "type": "git",
     "url": "https://github.com/allenhwkim/angularjs-google-maps.git"
